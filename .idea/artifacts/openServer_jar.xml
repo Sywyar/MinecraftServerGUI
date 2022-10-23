@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="openServer:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/openServer_jar</output-path>
+    <root id="archive" name="openServer.jar">
+      <element id="module-output" name="openServer" />
+    </root>
+  </artifact>
+</component>
