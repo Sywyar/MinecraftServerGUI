@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.sywyar.openServer.openServer
+Main-Class: com.sywyar.openserver.OpenServer
 

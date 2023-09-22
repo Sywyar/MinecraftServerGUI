@@ -1,4 +1,7 @@
-package com.sywyar.openServer;
+package com.sywyar.openserver.build;
+
+import com.sywyar.openserver.OpenServer;
+import com.sywyar.openserver.jdialogs.ErrorJDialog;
 
 import javax.swing.*;
 import java.io.BufferedReader;
@@ -7,25 +10,28 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-import static com.sywyar.openServer.openServer.processArrayList;
+import static com.sywyar.openserver.OpenServer.processArrayList;
 
-public class buildToolsThread extends Thread{
-    private String version;
+public class BuildToolsThread extends Thread{
+    private final String version;
     private String cmd;
-    private JTextField jTextArea;
-    private JLabel jLabel;
+    private final JLabel jLabel;
+    private final String javaPATH;
 
-    public buildToolsThread(String version,JTextField jTextArea,String cmd,JLabel jLabel){
+    public BuildToolsThread(String version, JLabel jLabel, String cmd, String javaPATH){
         this.version=version;
-        this.jTextArea = jTextArea;
         this.cmd = cmd;
         this.jLabel=jLabel;
+        this.javaPATH=javaPATH;
     }
 
     @Override
     public void run() {
         try {
             File dir = new File(System.getProperty("user.dir")+"//BuildTools");
+            if (!javaPATH.isEmpty()){
+                cmd = cmd.replace("java",javaPATH);
+            }
             Process ps = Runtime.getRuntime().exec(cmd, null, dir);
             processArrayList.add(ps);
             BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream(), Charset.forName("GBK")));
@@ -37,15 +43,19 @@ public class buildToolsThread extends Thread{
                 jLabel.setText("<html><body>"+all+"</body></html>");
                 lineNum++;
             }
-            File file = new File(dir.getPath()+"//"+version);
-            if (!file.exists()){
-                file.mkdirs();
+            if (ps.waitFor()!=0){
+                new ErrorJDialog();
+            }else{
+                File file = new File(dir.getPath()+"//"+version);
+                if (!file.exists()){
+                    file.mkdirs();
+                }
+                processArrayList.remove(ps);
+                new ProcessBuilder("cmd", "/c", "cd BuildTools & move "+"spigot-"+version+".jar"+" "+version).inheritIO().start().waitFor();
+                OpenServer.build=true;
+                br.close();
+                ps.waitFor();
             }
-            processArrayList.remove(ps);
-            new ProcessBuilder("cmd", "/c", "cd BuildTools & move "+"spigot-"+version+".jar"+" "+version).inheritIO().start().waitFor();
-            openServer.build=true;
-            br.close();
-            ps.waitFor();
         } catch (InterruptedException | IOException ex) {
             throw new RuntimeException(ex);
         }

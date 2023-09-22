@@ -1,23 +1,21 @@
-package com.sywyar.openServer;
+package com.sywyar.openserver.build;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 public class JTextFieldHintListener implements FocusListener {
-    private String hintText;
-    private JTextField textField;
+    private final String hintText;
+    private final JTextField textField;
 
     public JTextFieldHintListener(JTextField jTextField,String hintText) {
         this.textField = jTextField;
         this.hintText = hintText;
-        jTextField.setText(hintText);  //默认直接显示
+        jTextField.setText(hintText);
     }
 
     @Override
     public void focusGained(FocusEvent e) {
-        //获取焦点时，清空提示内容
         String temp = textField.getText();
         if(temp.equals(hintText)) {
             textField.setText("");
@@ -26,9 +24,8 @@ public class JTextFieldHintListener implements FocusListener {
 
     @Override
     public void focusLost(FocusEvent e) {
-        //失去焦点时，没有输入内容，显示提示内容
         String temp = textField.getText();
-        if(temp.equals("")) {
+        if(temp.isEmpty()) {
             textField.setText(hintText);
         }
     }
